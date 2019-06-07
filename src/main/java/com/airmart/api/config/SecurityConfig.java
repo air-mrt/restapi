@@ -41,6 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/auth/login").permitAll()
                 .antMatchers("/api/auth/register").permitAll()
                 .antMatchers("/api/products/auth/**").hasAuthority("USER")
+                .antMatchers("/api/comments/auth/**").hasAuthority("USER")
                 .anyRequest().permitAll()
                 .and()
                 .csrf().disable()

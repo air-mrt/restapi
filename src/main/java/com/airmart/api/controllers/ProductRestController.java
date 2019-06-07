@@ -59,8 +59,12 @@ public class ProductRestController {
 
     }
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts(){
-        return new ResponseEntity<>(productService.getAll(),HttpStatus.OK);
+    public ResponseEntity<List<Product>> getAllProducts(
+            @RequestParam(value="username", required = false, defaultValue = "null") String username){
+        if(username.contentEquals("null")){
+            return new ResponseEntity<>(productService.getAll(),HttpStatus.OK);
+        }
+        return new ResponseEntity<>(productService.getByUsername(username),HttpStatus.OK);
 
     }
     @GetMapping("/{id}")
@@ -72,7 +76,6 @@ public class ProductRestController {
         return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
     }
     @DeleteMapping("/auth/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Product> deleteProductById(@PathVariable("id") Long id,
                                                         @RequestHeader(value = "Authorization" ,required = true ) String bearerToken){
         try {
