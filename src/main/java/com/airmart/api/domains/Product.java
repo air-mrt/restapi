@@ -1,7 +1,10 @@
 package com.airmart.api.domains;
 
 import com.sun.istack.internal.NotNull;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -9,6 +12,8 @@ import java.util.Date;
 
 @Data
 @Entity
+@NoArgsConstructor(access= AccessLevel.PRIVATE, force=true)
+@RequiredArgsConstructor
 @Table(name="product",schema="airmart")
 public class Product{
 
