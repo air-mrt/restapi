@@ -4,7 +4,6 @@ import com.airmart.api.domains.Product;
 import com.airmart.api.domains.User;
 import com.airmart.api.repos.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;

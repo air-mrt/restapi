@@ -2,7 +2,6 @@ package com.airmart.api.controllers;
 
 import com.airmart.api.config.JwtTokenProvider;
 import com.airmart.api.domains.Comment;
-import com.airmart.api.domains.Product;
 import com.airmart.api.services.CommentService;
 import com.airmart.api.services.ProductService;
 import com.airmart.api.services.UserService;

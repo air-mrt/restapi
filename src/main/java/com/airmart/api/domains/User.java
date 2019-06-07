@@ -1,8 +1,6 @@
 package com.airmart.api.domains;
 
-import com.sun.istack.internal.NotNull;
 import lombok.Data;
-import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
