@@ -18,6 +18,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     private UserService userService;
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth)

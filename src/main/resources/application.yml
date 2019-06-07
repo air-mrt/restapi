@@ -1,0 +1,55 @@
+
+---
+spring:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/airmart
+    username: airmart_user
+    password: airmart_user
+---
+spring:
+  jpa:
+    hibernate.ddl-auto: none
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+
+---
+
+spring:
+      jpa:
+         properties:
+                   hibernate:
+                            format_sql: true
+---
+spring:
+       datasource:
+                 initialization-mode: always
+
+---
+
+
+spring:
+  jpa:
+    properties:
+      javax:
+        persistence:
+          schema-generation:
+            create-source: metadata
+            scripts:
+              action: create
+              create-target: airmart_db_create.sql
+---
+
+# MULTIPART (MultipartProperties)
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 200MB
+      max-request-size: 215MB
+
+---
+
+file:
+  upload-dir: ./uploads
