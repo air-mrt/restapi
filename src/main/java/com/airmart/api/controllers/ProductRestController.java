@@ -36,7 +36,7 @@ public class ProductRestController {
     @PostMapping(path = "/auth", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Product> postProduct(
             @RequestParam(value="productJson", required = true ) String productJson,
-            @RequestParam(required = true, value="file") MultipartFile file,
+            @RequestParam(required = true, value="image") MultipartFile file,
             @RequestHeader(value = "Authorization" ,required = true ) String bearerToken)
             throws IOException {
         try{
