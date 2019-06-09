@@ -62,7 +62,7 @@ public class AuthRestController {
                                    @RequestParam(required = false, value="image") MultipartFile file) throws IOException {
 
         String fileName = fileStorageService.storeFile(file);
-        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/product/downloadImage/").path(fileName).toUriString();
+        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/ProfilePic/").path(fileName).toUriString();
         User user = objectMapper.readValue(userJson,User.class);
         user.setProfilePicture(fileDownloadUri);
         User userExists = userService.findUserByUsername(user.getUsername());
