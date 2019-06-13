@@ -1,4 +1,4 @@
-package com.airmart.api.domains;
+package com.airmart.api.models;
 
 import lombok.Data;
 

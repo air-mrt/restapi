@@ -8,7 +8,9 @@ import com.airmart.api.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
@@ -41,7 +44,7 @@ public class ProductRestController {
             throws IOException {
         try{
             String fileName = fileStorageService.storeFile(file);
-            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/product/downloadImage/").path(fileName).toUriString();
+            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/products/downloadImage/").path(fileName).toUriString();
             Product product = objectMapper.readValue(productJson,Product.class);
             product.setPicturePath(fileDownloadUri);
             String username = jwtTokenProvider.getUsername(bearerToken.substring(7, bearerToken.length()));
@@ -90,4 +93,22 @@ public class ProductRestController {
         catch(EmptyResultDataAccessException e) {
         }
         return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST); }
+    @GetMapping("/downloadImage/{fileName:.+}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request){
+        Resource resource  = fileStorageService.loadFileAsResource(fileName);
+        String contentType = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        }
+        catch(IOException ex) {
+            ex.printStackTrace();
+        }
+        if(contentType == null) {
+            contentType = "application/octet-stream";
+        }
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=\"%s\"", resource.getFilename()))
+                .body(resource);
+
+    }
 }
