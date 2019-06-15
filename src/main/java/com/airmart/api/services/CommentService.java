@@ -32,6 +32,7 @@ public class CommentService {
     public void deleteById(Long id) {
         commentRepo.deleteById(id);
     }
+
     public Comment getById(Long id) {
         if(commentRepo.existsById(id)) {
             return commentRepo.findById(id).get();

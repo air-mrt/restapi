@@ -2,6 +2,7 @@ package com.airmart.api.controllers;
 
 import com.airmart.api.config.JwtTokenProvider;
 import com.airmart.api.domains.Comment;
+import com.airmart.api.models.CommentResponse;
 import com.airmart.api.services.CommentService;
 import com.airmart.api.services.ProductService;
 import com.airmart.api.services.UserService;
@@ -28,16 +29,15 @@ public class CommentRestController {
     @Autowired
     JwtTokenProvider jwtTokenProvider;
     ObjectMapper objectMapper = new ObjectMapper();
-
     @GetMapping()
-    public ResponseEntity<List<Comment>> getAllCommentsForProduct(@RequestParam(name = "productId" ,required=true)Long productId){
-        return new ResponseEntity<>(commentService.getByProductId(productId), HttpStatus.OK);
+    public ResponseEntity<List<CommentResponse>> getAllCommentsForProduct(@RequestParam(name = "productId" ,required=true)Long productId){
+        return new ResponseEntity<>(CommentResponse.convertToCommentResponse(commentService.getByProductId(productId)), HttpStatus.OK);
     }
     @GetMapping("/{id}")
-    public ResponseEntity<Comment> getCommentById(@PathVariable("id") Long id){
+    public ResponseEntity<CommentResponse> getCommentById(@PathVariable("id") Long id){
         Comment comment = commentService.getById(id);
         if(comment != null) {
-            return new ResponseEntity<>(comment,HttpStatus.OK);
+            return new ResponseEntity<>(CommentResponse.convertToCommentResponse(comment),HttpStatus.OK);
         }
         return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
     }
@@ -62,14 +62,16 @@ public class CommentRestController {
         return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST); }
 
     @PostMapping(path = "/auth",consumes = "application/json")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Comment save(@RequestBody Comment comment,
+    public ResponseEntity<Comment> save(@RequestParam(name = "comment", required = true) String comment,
                         @RequestParam(name = "productId", required = true)Long productId,
                         @RequestHeader(value = "Authorization" ,required = true ) String bearerToken) {
+        Comment commentObj = new Comment();
         String username = jwtTokenProvider.getUsername(bearerToken.substring(7, bearerToken.length()));
-        comment.setUser(userService.findUserByUsername(username));
-        comment.setProduct(productService.getById(productId));
-        return commentService.save(comment);
+        commentObj.setUser(userService.findUserByUsername(username));
+        commentObj.setProduct(productService.getById(productId));
+        commentObj.setContent(comment);
+        commentService.save(commentObj);
+        return new ResponseEntity<>(commentObj,HttpStatus.CREATED);
     }
 
 

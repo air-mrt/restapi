@@ -3,6 +3,7 @@ package com.airmart.api.controllers;
 import com.airmart.api.config.JwtTokenProvider;
 import com.airmart.api.domains.Product;
 import com.airmart.api.domains.User;
+import com.airmart.api.models.ProductResponse;
 import com.airmart.api.services.FileStorageService;
 import com.airmart.api.services.ProductService;
 import com.airmart.api.services.UserService;
@@ -38,7 +39,7 @@ public class ProductRestController {
     ObjectMapper objectMapper = new ObjectMapper();
 
     @PostMapping(path = "/auth", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Product> postProduct(
+    public ResponseEntity<ProductResponse> postProduct(
             @RequestParam(value="productJson", required = true ) String productJson,
             @RequestParam(required = true, value="image") MultipartFile file,
             @RequestHeader(value = "Authorization" ,required = true ) String bearerToken)
@@ -51,24 +52,21 @@ public class ProductRestController {
             String username = jwtTokenProvider.getUsername(bearerToken.substring(7, bearerToken.length()));
             product.setUser(userService.findUserByUsername(username));
             productService.save(product);
-            return new ResponseEntity<>(product,HttpStatus.CREATED);
+            return new ResponseEntity<>(ProductResponse.convertToProductResponse(product),HttpStatus.CREATED);
         }
         catch(JwtException e) {
             return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
         }
-
-
     }
-
     @PostMapping(path = "/interested/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Product> interestedInProduct(@PathVariable("id") Long id,
+    public ResponseEntity<ProductResponse> interestedInProduct(@PathVariable("id") Long id,
                                                        @RequestHeader(value = "Authorization" ,required = true ) String bearerToken) {
         try{
             Product product = productService.getById(id);
             String username = jwtTokenProvider.getUsername(bearerToken.substring(7, bearerToken.length()));
             User user = userService.findUserByUsername(username);
             if(productService.interestedInProduct(id,user)){
-                return new ResponseEntity<>(product,HttpStatus.OK);
+                return new ResponseEntity<>(ProductResponse.convertToProductResponse(product),HttpStatus.OK);
             }
             return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
         }
@@ -79,24 +77,24 @@ public class ProductRestController {
 
     }
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts(
+    public ResponseEntity<List<ProductResponse>> getAllProducts(
             @RequestParam(value="username", required = false, defaultValue = "null") String username){
         if(username.contentEquals("null")){
-            return new ResponseEntity<>(productService.getAll(),HttpStatus.OK);
+            return new ResponseEntity<>(ProductResponse.convertToProductResponse(productService.getAll()),HttpStatus.OK);
         }
-        return new ResponseEntity<>(productService.getByUsername(username),HttpStatus.OK);
+        return new ResponseEntity<>(ProductResponse.convertToProductResponse(productService.getByUsername(username)),HttpStatus.OK);
 
     }
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable("id") Long id){
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable("id") Long id){
        Product product = productService.getById(id);
         if(product != null) {
-            return new ResponseEntity<>(product,HttpStatus.OK);
+            return new ResponseEntity<>(ProductResponse.convertToProductResponse(product),HttpStatus.OK);
         }
         return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
     }
     @DeleteMapping("/auth/{id}")
-    public ResponseEntity<Product> deleteProductById(@PathVariable("id") Long id,
+    public ResponseEntity<ProductResponse> deleteProductById(@PathVariable("id") Long id,
                                                         @RequestHeader(value = "Authorization" ,required = true ) String bearerToken){
         try {
             //First check if the product was posted by the same user
@@ -129,6 +127,5 @@ public class ProductRestController {
         return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=\"%s\"", resource.getFilename()))
                 .body(resource);
-
     }
 }
