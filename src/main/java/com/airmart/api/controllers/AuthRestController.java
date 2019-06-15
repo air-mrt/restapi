@@ -4,7 +4,9 @@ import com.airmart.api.config.JwtTokenProvider;
 import com.airmart.api.models.AuthBody;
 import com.airmart.api.models.LoginResponse;
 import com.airmart.api.domains.User;
+import com.airmart.api.models.UserInfo;
 import com.airmart.api.services.FileStorageService;
+import com.airmart.api.services.ProductService;
 import com.airmart.api.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +43,10 @@ public class AuthRestController {
     FileStorageService fileStorageService;
     ObjectMapper objectMapper = new ObjectMapper();
 
-
-
     @Autowired
     private UserService userService;
+    @Autowired
+    private ProductService productService;
 
 //    @SuppressWarnings("rawtypes")
 //    @PostMapping("/login")
@@ -80,9 +82,11 @@ public class AuthRestController {
     @PostMapping(path="/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity register(@RequestParam(value="userJson") String userJson,
                                    @RequestParam(required = false, value="image") MultipartFile file) throws IOException {
-
-        String fileName = fileStorageService.storeFile(file);
-        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/profilePic/").path(fileName).toUriString();
+        String fileDownloadUri =  ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/profilePic/").path("default.png").toUriString();
+        if(file != null){
+            String fileName = fileStorageService.storeFile(file);
+            fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/profilePic/").path(fileName).toUriString();
+        }
         User user = objectMapper.readValue(userJson,User.class);
         user.setProfilePicture(fileDownloadUri);
         User userExists = userService.findUserByUsername(user.getUsername());
@@ -93,6 +97,14 @@ public class AuthRestController {
         Map<Object, Object> model = new HashMap<>();
         model.put("message", "User registered successfully");
         return ok(model);
+    }
+    @GetMapping("/users/info")
+    public ResponseEntity<UserInfo> getLoggedInUserInfo(@RequestHeader(value = "Authorization" ,required = true ) String bearerToken){
+        String username= jwtTokenProvider.getUsername(bearerToken.substring(7, bearerToken.length()));
+        User user= userService.findUserByUsername(username);
+        String numberofPosts = Integer.toString(productService.getByUsername(username).size());
+        UserInfo userInfo = new UserInfo(user.getName(),username,user.getPhone(),user.getEmail(),user.getProfilePicture(),numberofPosts);
+        return new ResponseEntity<>(userInfo,HttpStatus.OK);
     }
     @GetMapping("/users/profilePic/{fileName:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request){

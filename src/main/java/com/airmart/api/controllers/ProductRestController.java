@@ -67,8 +67,10 @@ public class ProductRestController {
             Product product = productService.getById(id);
             String username = jwtTokenProvider.getUsername(bearerToken.substring(7, bearerToken.length()));
             User user = userService.findUserByUsername(username);
-            productService.interestedInProduct(id,user);
-            return new ResponseEntity<>(product,HttpStatus.OK);
+            if(productService.interestedInProduct(id,user)){
+                return new ResponseEntity<>(product,HttpStatus.OK);
+            }
+            return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
         }
         catch(JwtException e) {
             return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
