@@ -31,9 +31,10 @@ public class ProductResponse {
     }
     private static Set<String> convertToStringSet(Set<User> userSet){
         Set<String> stringSet = new HashSet<>(Arrays.asList());
-
+        if(userSet != null){
         for(User user:userSet){
             stringSet.add(user.getUsername());
+        }
         }
         return stringSet;
     }

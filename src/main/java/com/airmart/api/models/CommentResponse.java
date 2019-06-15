@@ -17,8 +17,10 @@ public class CommentResponse {
 
     public static  List<CommentResponse> convertToCommentResponse(List<Comment> comments){
         List<CommentResponse> commentResponses = new ArrayList<CommentResponse>();
+        if(comments != null){
         for(Comment comment:comments){
             commentResponses.add(new CommentResponse(comment.getId(),comment.getProduct().getId(),comment.getUser().getUsername(),comment.getContent()));
+        }
         }
         return commentResponses;
     }
