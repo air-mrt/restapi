@@ -2,6 +2,7 @@ package com.airmart.api.controllers;
 
 import com.airmart.api.config.JwtTokenProvider;
 import com.airmart.api.domains.Product;
+import com.airmart.api.domains.User;
 import com.airmart.api.services.FileStorageService;
 import com.airmart.api.services.ProductService;
 import com.airmart.api.services.UserService;
@@ -51,6 +52,23 @@ public class ProductRestController {
             product.setUser(userService.findUserByUsername(username));
             productService.save(product);
             return new ResponseEntity<>(product,HttpStatus.CREATED);
+        }
+        catch(JwtException e) {
+            return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+        }
+
+
+    }
+
+    @PostMapping(path = "/interested/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Product> interestedInProduct(@PathVariable("id") Long id,
+                                                       @RequestHeader(value = "Authorization" ,required = true ) String bearerToken) {
+        try{
+            Product product = productService.getById(id);
+            String username = jwtTokenProvider.getUsername(bearerToken.substring(7, bearerToken.length()));
+            User user = userService.findUserByUsername(username);
+            productService.interestedInProduct(id,user);
+            return new ResponseEntity<>(product,HttpStatus.OK);
         }
         catch(JwtException e) {
             return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ProductService {
@@ -48,10 +49,17 @@ public class ProductService {
        return repository.findAllByUser(user);
 
     }
-
-
-
-
+    public boolean interestedInProduct(Long id, User user){
+        if(repository.existsById(id)) {
+            Product product = repository.findById(id).get();
+            Set<User> set= product.getInterested();
+            set.add(user);
+            product.setInterested(set);
+            repository.save(product);
+            return true;
+        }
+        return false;
+    }
     public List<Product> getAll() {
         List<Product> all = (List<Product>) repository.findAll();
         Collections.reverse(all);

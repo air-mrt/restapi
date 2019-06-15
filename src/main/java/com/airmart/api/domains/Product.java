@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
+import java.util.Set;
 
 @Data
 @Entity
@@ -32,6 +33,11 @@ public class Product{
     private Date createdAt = new Date();
     @ManyToOne
     private  User user;
+    @ManyToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER)
+    @JoinTable(name="product_user",
+            joinColumns= {@JoinColumn(name="product_id")},
+            inverseJoinColumns= {@JoinColumn(name="user_id")})
+    private Set<User> interested;
     private String picturePath;
 
     @PrePersist
