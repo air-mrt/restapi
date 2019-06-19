@@ -9,6 +9,9 @@ import com.airmart.api.services.FileStorageService;
 import com.airmart.api.services.ProductService;
 import com.airmart.api.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -73,6 +76,7 @@ public class AuthRestController {
             LoginResponse loginResponse = new LoginResponse();
             loginResponse.setUsername(username);
             loginResponse.setToken(token);
+            loginResponse.setExpirationDate(jwtTokenProvider.getExpirationDate(token));
             return new ResponseEntity<>(loginResponse, HttpStatus.OK);
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid username/password supplied");

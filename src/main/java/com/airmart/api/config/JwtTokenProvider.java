@@ -24,8 +24,8 @@ public class JwtTokenProvider {
     @Value("${security.jwt.token.secret-key:secret}")
     private String secretKey = "secret";
 
-    @Value("${security.jwt.token.expire-length:3600000}")
-    private long validityInMilliseconds = 10800000; // 3h
+    @Value("${security.jwt.token.expire-length:3600}")
+    private long validityInMilliseconds = 3600; // 3h
 
     @Autowired
     private UserService userDetailsService;
@@ -75,5 +75,9 @@ public class JwtTokenProvider {
         } catch (JwtException | IllegalArgumentException e) {
             throw new JwtException("Expired or invalid JWT token");
         }
+    }
+    public Date getExpirationDate(String token){
+        Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+        return claims.getBody().getExpiration();
     }
 }
