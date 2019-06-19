@@ -9,4 +9,5 @@ public class LoginResponse {
     String username;
     String token;
     Date expirationDate;
+    Date issuedDate;
 }

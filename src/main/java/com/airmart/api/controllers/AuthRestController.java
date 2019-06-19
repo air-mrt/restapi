@@ -77,6 +77,7 @@ public class AuthRestController {
             loginResponse.setUsername(username);
             loginResponse.setToken(token);
             loginResponse.setExpirationDate(jwtTokenProvider.getExpirationDate(token));
+            loginResponse.setIssuedDate(jwtTokenProvider.getIssuedDate(token));
             return new ResponseEntity<>(loginResponse, HttpStatus.OK);
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid username/password supplied");

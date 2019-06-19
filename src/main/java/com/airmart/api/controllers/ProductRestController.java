@@ -41,12 +41,16 @@ public class ProductRestController {
     @PostMapping(path = "/auth", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductResponse> postProduct(
             @RequestParam(value="productJson", required = true ) String productJson,
-            @RequestParam(required = true, value="image") MultipartFile file,
+            @RequestParam(required = false, value="image") MultipartFile file,
             @RequestHeader(value = "Authorization" ,required = true ) String bearerToken)
             throws IOException {
         try{
-            String fileName = fileStorageService.storeFile(file);
-            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/products/downloadImage/").path(fileName).toUriString();
+            String  fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/products/downloadImage/").path("no_image.png").toUriString();
+            if(file != null){
+                String fileName = fileStorageService.storeFile(file);
+                fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/products/downloadImage/").path(fileName).toUriString();
+            }
+
             Product product = objectMapper.readValue(productJson,Product.class);
             product.setPicturePath(fileDownloadUri);
             String username = jwtTokenProvider.getUsername(bearerToken.substring(7, bearerToken.length()));
