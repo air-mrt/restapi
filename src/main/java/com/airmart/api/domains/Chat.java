@@ -34,7 +34,7 @@ public class Chat {
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = ApiConstants.DATE_PATTERN)
     @JsonDeserialize(using = DateDeserializer.class)
-    private Date postedDate;
+    private Date postedDate = new Date();
     @Transient
     private List<User> users;
     @OneToMany(mappedBy = "chat")

@@ -17,7 +17,11 @@ public class ChatService  {
     private ChatRepo chatRepository;
 
     public Chat getById(Long id) {
-        return chatRepository.findById(id).get();
+
+        if (chatRepository.findById(id).isPresent()){
+            return chatRepository.findById(id).get();
+        }
+        return null;
     }
 
 

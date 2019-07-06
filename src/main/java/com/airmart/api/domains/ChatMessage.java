@@ -27,7 +27,7 @@ public class ChatMessage {
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonDeserialize(using = UserDeserializer.class)
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "username")
     private User user;
     @ManyToOne
     @JoinColumn(name = "chat_id")
@@ -40,5 +40,5 @@ public class ChatMessage {
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = ApiConstants.DATE_PATTERN)
     @JsonDeserialize(using = DateDeserializer.class)
-    private Date postedDate;
+    private Date postedDate= new Date();
 }

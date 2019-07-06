@@ -31,11 +31,11 @@ public class ProductRestController {
     @Autowired
     ProductService productService;
     @Autowired
-    UserService userService;
-    @Autowired
     FileStorageService fileStorageService;
     @Autowired
     JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    UserService userService;
     ObjectMapper objectMapper = new ObjectMapper();
 
     @PostMapping(path = "/auth", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -55,6 +55,32 @@ public class ProductRestController {
             product.setPicturePath(fileDownloadUri);
             String username = jwtTokenProvider.getUsername(bearerToken.substring(7, bearerToken.length()));
             product.setUser(userService.findUserByUsername(username));
+            productService.save(product);
+            return new ResponseEntity<>(ProductResponse.convertToProductResponse(product),HttpStatus.CREATED);
+        }
+        catch(JwtException e) {
+            return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+        }
+    }
+    @PatchMapping(path = "/auth/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductResponse> patchProduct(
+            @PathVariable("id") Long id,
+            @RequestParam(value="productJson", required = true ) String productJson,
+            @RequestParam(required = false, value="image") MultipartFile file,
+            @RequestHeader(value = "Authorization" ,required = true ) String bearerToken)
+            throws IOException {
+        try{
+            String  fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/products/downloadImage/").path("no_image.png").toUriString();
+            if(file != null){
+                String fileName = fileStorageService.storeFile(file);
+                fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/products/downloadImage/").path(fileName).toUriString();
+            }
+
+            Product product = objectMapper.readValue(productJson,Product.class);
+            product.setPicturePath(fileDownloadUri);
+            String username = jwtTokenProvider.getUsername(bearerToken.substring(7, bearerToken.length()));
+            product.setUser(userService.findUserByUsername(username));
+            product.setId(id);
             productService.save(product);
             return new ResponseEntity<>(ProductResponse.convertToProductResponse(product),HttpStatus.CREATED);
         }

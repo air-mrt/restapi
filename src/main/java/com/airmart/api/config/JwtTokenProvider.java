@@ -24,8 +24,8 @@ public class JwtTokenProvider {
     @Value("${security.jwt.token.secret-key:secret}")
     private String secretKey = "secret";
 
-    @Value("${security.jwt.token.expire-length:600000}")
-    private long validityInMilliseconds = 600000; //
+    @Value("${security.jwt.token.expire-length:600000000}")
+    private long validityInMilliseconds = 600000000; //
 
     @Autowired
     private UserService userDetailsService;
