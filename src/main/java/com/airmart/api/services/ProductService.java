@@ -3,6 +3,7 @@ package com.airmart.api.services;
 import com.airmart.api.domains.Product;
 import com.airmart.api.domains.User;
 import com.airmart.api.repos.ProductRepo;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,6 +65,9 @@ public class ProductService {
         List<Product> all = (List<Product>) repository.findAll();
         Collections.reverse(all);
         return all;
+    }
+    public List<Product> search(BooleanExpression exp){
+        return (List<Product>) repository.findAll(exp);
     }
 
 }

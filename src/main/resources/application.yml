@@ -8,19 +8,19 @@ spring:
     username: airmart_user
     password: airmart_user
 ---
-spring:
-  jpa:
-    hibernate.ddl-auto: none
-    database: mysql
-    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+#spring:
+#  jpa:
+#    hibernate.ddl-auto: none
+#    database: mysql
+#    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
 
 ---
 
-spring:
-      jpa:
-         properties:
-                   hibernate:
-                            format_sql: true
+#spring:
+#      jpa:
+#         properties:
+#                   hibernate:
+#                            format_sql: true
 ---
 spring:
        datasource:

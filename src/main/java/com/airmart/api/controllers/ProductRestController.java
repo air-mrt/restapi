@@ -1,6 +1,7 @@
 package com.airmart.api.controllers;
 
 import com.airmart.api.config.JwtTokenProvider;
+import com.airmart.api.config.ProductPredicatesBuilder;
 import com.airmart.api.domains.Product;
 import com.airmart.api.domains.User;
 import com.airmart.api.models.ProductResponse;
@@ -8,6 +9,7 @@ import com.airmart.api.services.FileStorageService;
 import com.airmart.api.services.ProductService;
 import com.airmart.api.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -23,6 +25,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @CrossOrigin(origins="*")
 @RestController
@@ -113,6 +117,23 @@ public class ProductRestController {
             return new ResponseEntity<>(ProductResponse.convertToProductResponse(productService.getAll()),HttpStatus.OK);
         }
         return new ResponseEntity<>(ProductResponse.convertToProductResponse(productService.getByUsername(username)),HttpStatus.OK);
+
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductResponse>> searchProducts(
+            @RequestParam(value="keyword") String search){
+       ProductPredicatesBuilder builder = new ProductPredicatesBuilder();
+
+        if (search != null) {
+            Pattern pattern = Pattern.compile("(\\w+?)(:|<|>)(\\w+?),");
+            Matcher matcher = pattern.matcher(search + ",");
+            while (matcher.find()) {
+                builder.with(matcher.group(1), matcher.group(2), matcher.group(3));
+            }
+        }
+        BooleanExpression exp = builder.build();
+        return new ResponseEntity<>(ProductResponse.convertToProductResponse(productService.search(exp)),HttpStatus.OK);
 
     }
     @GetMapping("/{id}")
