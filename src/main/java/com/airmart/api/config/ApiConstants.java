@@ -14,5 +14,8 @@ public class ApiConstants {
     public static final String FILE_SEPARATOR = "_";
     public static final String FILE_STORAGE_EXCEPTION = "Could not store file %s";
     public static final String FILE_NOT_FOUND = "File not Found";
-
+    public static final int PER_PAGE = 2;
+    public static final String VALIDATION_FAILED = "Validation Failed";
+    public static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+    public static final String DATE_PATTERN_JSON = "MM/dd/yyyy";
 }

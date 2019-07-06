@@ -1,5 +1,7 @@
 package com.airmart.api.domains;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -8,7 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -47,6 +51,15 @@ public class User implements UserDetails {
             inverseJoinColumns= {@JoinColumn(name="role_id")})
     private Set<Role> roles;
     private String profilePicture;
+
+    @OneToMany(mappedBy="owner")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    //@JsonDeserialize(using = ChatListDeserializer.class)
+    private List<Chat> chats = new ArrayList<>();
+
+    public User(String username) {
+        this.username = username;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

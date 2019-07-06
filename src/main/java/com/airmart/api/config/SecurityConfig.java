@@ -41,6 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/register").permitAll()
                 .antMatchers("/api/products/auth/**").hasAuthority("USER")
                 .antMatchers("/api/comments/auth/**").hasAuthority("USER")
+                .antMatchers("/api/chat/auth/**").hasAuthority("USER")
                 .and()
                 .csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint())

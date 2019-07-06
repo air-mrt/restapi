@@ -16,7 +16,7 @@ import java.util.Set;
 @NoArgsConstructor(access= AccessLevel.PRIVATE, force=true)
 @RequiredArgsConstructor
 @Table(name="product",schema="airmart")
-public class Product{
+public class Product {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
