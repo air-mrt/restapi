@@ -1,6 +1,7 @@
 package com.airmart.api.services;
 
 import com.airmart.api.domains.Chat;
+import com.airmart.api.domains.User;
 import com.airmart.api.repos.ChatRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -44,4 +45,7 @@ public class ChatService  {
         Pageable pageable = new PageRequest(page, size, new Sort(new Sort.Order(Sort.Direction.DESC, "postedDate")));
         return chatRepository.findAll(pageable);
     }
+//    public Chat findByUsers(List<User> users){
+//        return chatRepository.findByUsers(users);
+//    }
 }
