@@ -74,7 +74,7 @@ public class ProductRestController {
             @RequestHeader(value = "Authorization" ,required = true ) String bearerToken)
             throws IOException {
         try{
-            String  fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/products/downloadImage/").path("no_image.png").toUriString();
+            String  fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/products/downloadImage/").path(productService.getById(id).getPicturePath()).toUriString();
             if(file != null){
                 String fileName = fileStorageService.storeFile(file);
                 fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/products/downloadImage/").path(fileName).toUriString();
@@ -92,7 +92,7 @@ public class ProductRestController {
             return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
         }
     }
-    @PostMapping(path = "/interested/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path = "/interested/{id}")
     public ResponseEntity<ProductResponse> interestedInProduct(@PathVariable("id") Long id,
                                                        @RequestHeader(value = "Authorization" ,required = true ) String bearerToken) {
         try{
