@@ -1,5 +1,6 @@
 package com.airmart.api.services;
 
+import com.airmart.api.domains.Chat;
 import com.airmart.api.domains.ChatMessage;
 import com.airmart.api.repos.ChatMessageRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,5 +48,9 @@ public class ChatMessageService {
     public Page<ChatMessage> findSortedPaginatedByDate(int page, int size) {
         Pageable pageable = new PageRequest(page, size, new Sort(new Sort.Order(Sort.Direction.DESC, "postedDate")));
         return chatMessageRepository.findAll(pageable);
+    }
+    public List<ChatMessage> findAllByChat(Chat chat){
+        return chatMessageRepository.findByChat(chat);
+
     }
 }

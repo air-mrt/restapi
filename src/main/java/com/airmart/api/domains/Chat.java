@@ -44,4 +44,7 @@ public class Chat {
     public Chat(Long id) {
         this.id = id;
     }
+    public Chat(List<User> users){
+        this.users = users;
+    }
 }

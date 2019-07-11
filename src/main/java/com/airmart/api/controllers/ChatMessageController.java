@@ -2,10 +2,13 @@ package com.airmart.api.controllers;
 
 import com.airmart.api.config.ApiConstants;
 import com.airmart.api.config.JwtTokenProvider;
+import com.airmart.api.domains.Chat;
 import com.airmart.api.domains.ChatMessage;
 import com.airmart.api.domains.User;
 import com.airmart.api.exception.BaseException;
 import com.airmart.api.exception.ChatException;
+import com.airmart.api.models.ChatMessageResponse;
+import com.airmart.api.models.ChatResponse;
 import com.airmart.api.models.helpers.CustomResponse;
 import com.airmart.api.models.helpers.ResponseHelper;
 import com.airmart.api.services.ChatMessageService;
@@ -21,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @CrossOrigin(origins="*")
 @RestController
@@ -36,31 +40,30 @@ public class ChatMessageController  {
     @Autowired
     ChatService chatService;
 
-    @GetMapping("/messages")
-    public ResponseEntity<CustomResponse<ChatMessage>> getMessages( @RequestHeader(value = "Authorization" ,required = true ) String bearerToken) {
-        // Page request number start at 0 not 1
-        Pageable pageable = new PageRequest(0, ApiConstants.PER_PAGE);
-        Page<ChatMessage> list = chatMessageService.findPaginated(pageable);
-        CustomResponse<ChatMessage> result = ResponseHelper.convertFromPage(list, pageable.getPageNumber(),
-                pageable.getPageSize());
-
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/messages", params = {"page"})
-    public @ResponseBody CustomResponse<ChatMessage> getPageChats(@RequestParam("page") int page,  @RequestHeader(value = "Authorization" ,required = true ) String bearerToken) {
-        Page<ChatMessage> list = chatMessageService.findSortedPaginatedByDate(page, ApiConstants.PER_PAGE);
-        CustomResponse<ChatMessage> result = ResponseHelper.convertFromPage(list, page, ApiConstants.PER_PAGE);
-
-        return result;
-    }
+//    @GetMapping("/messages")
+//    public ResponseEntity<CustomResponse<ChatMessage>> getMessages( @RequestHeader(value = "Authorization" ,required = true ) String bearerToken) {
+//        // Page request number start at 0 not 1
+//        Pageable pageable = new PageRequest(0, ApiConstants.PER_PAGE);
+//        Page<ChatMessage> list = chatMessageService.findPaginated(pageable);
+//        CustomResponse<ChatMessage> result = ResponseHelper.convertFromPage(list, pageable.getPageNumber(),
+//                pageable.getPageSize());
+//
+//        return new ResponseEntity<>(result, HttpStatus.OK);
+//    }
+//
+//    @GetMapping(value = "/messages", params = {"page"})
+//    public @ResponseBody CustomResponse<ChatMessage> getPageChats(@RequestParam("page") int page,  @RequestHeader(value = "Authorization" ,required = true ) String bearerToken) {
+//        Page<ChatMessage> list = chatMessageService.findSortedPaginatedByDate(page, ApiConstants.PER_PAGE);
+//        CustomResponse<ChatMessage> result = ResponseHelper.convertFromPage(list, page, ApiConstants.PER_PAGE);
+//
+//        return result;
+//    }
 
     @GetMapping("/messages/{id}")
-    public ResponseEntity<ChatMessage> getMessage(@PathVariable("id") long id,  @RequestHeader(value = "Authorization" ,required = true ) String bearerToken) throws ChatException {
-        if (id <= 0 || chatMessageService.getById(id) == null) {
-            throw new ChatException("Chat id can not be found!");
-        }
-        return new ResponseEntity<>(chatMessageService.getById(id), HttpStatus.OK);
+    public ResponseEntity<List<ChatMessageResponse>> getMessage(@PathVariable("id") long id, @RequestHeader(value = "Authorization" ,required = true ) String bearerToken) throws ChatException {
+        String username = jwtTokenProvider.getUsername(bearerToken.substring(7, bearerToken.length()));
+        Chat chat = chatService.getById(id);
+        return new ResponseEntity<>(ChatMessageResponse.convertToChatMessageResponse(chatMessageService.findAllByChat(chat)), HttpStatus.OK);
     }
     @DeleteMapping("/messages/{id}")
     public ResponseEntity<ChatMessage> deleteMessage(@PathVariable("id") long id,  @RequestHeader(value = "Authorization" ,required = true ) String bearerToken) throws ChatException {
@@ -71,16 +74,16 @@ public class ChatMessageController  {
         return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/messages")
-    public ResponseEntity<ChatMessage> save(@RequestParam(value = "message")String message,
-                                            @RequestParam(value = "chat_id")Long chatId,
+    @PostMapping("/messages/{id}")
+    public ResponseEntity<ChatMessageResponse> save(@RequestParam(value = "message")String message,
+                                            @PathVariable("id")Long chatId,
                                             @RequestHeader(value = "Authorization" ,required = true ) String bearerToken) throws BaseException {
         String username = jwtTokenProvider.getUsername(bearerToken.substring(7, bearerToken.length()));
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setChat(chatService.getById(chatId));
         chatMessage.setMessage(message);
         chatMessage.setUser(userService.findUserByUsername(username));
-        return new ResponseEntity<>(chatMessageService.save(chatMessage), HttpStatus.OK);
+        return new ResponseEntity<>(ChatMessageResponse.convertToChatMessageResponse(chatMessageService.save(chatMessage)), HttpStatus.OK);
     }
 
     @PatchMapping("/messages")

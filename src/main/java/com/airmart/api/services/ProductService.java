@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -61,6 +62,17 @@ public class ProductService {
         }
         return false;
     }
+    public boolean uninterestedInProduct(Long id, User user){
+        if(repository.existsById(id)) {
+            Product product = repository.findById(id).get();
+            Set<User> set= product.getInterested();
+            set.remove(user);
+            product.setInterested(set);
+            repository.save(product);
+            return true;
+        }
+        return false;
+    }
     public List<Product> getAll() {
         List<Product> all = (List<Product>) repository.findAll();
         Collections.reverse(all);
@@ -68,6 +80,16 @@ public class ProductService {
     }
     public List<Product> search(BooleanExpression exp){
         return (List<Product>) repository.findAll(exp);
+    }
+    public List<Product> findAllInterestedByUser(User user){
+        List<Product> all = new ArrayList<>();
+        for (Product product:
+                repository.findAll()) {
+            if(product.getInterested().contains(user)){
+                all.add(product);
+            }
+        }
+        return all;
     }
 
 }

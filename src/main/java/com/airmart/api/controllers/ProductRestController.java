@@ -110,14 +110,42 @@ public class ProductRestController {
 
 
     }
+    @PostMapping(path = "/uninterested/{id}")
+    public ResponseEntity<ProductResponse> uninterestedInProduct(@PathVariable("id") Long id,
+                                                               @RequestHeader(value = "Authorization" ,required = true ) String bearerToken) {
+        try{
+            Product product = productService.getById(id);
+            String username = jwtTokenProvider.getUsername(bearerToken.substring(7, bearerToken.length()));
+            User user = userService.findUserByUsername(username);
+            if(productService.uninterestedInProduct(id,user)){
+                return new ResponseEntity<>(ProductResponse.convertToProductResponse(product),HttpStatus.OK);
+            }
+            return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+        }
+        catch(JwtException e) {
+            return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+        }
+
+
+    }
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getAllProducts(
-            @RequestParam(value="username", required = false, defaultValue = "null") String username){
-        if(username.contentEquals("null")){
+    public ResponseEntity<List<ProductResponse>> getAllProducts(){
             return new ResponseEntity<>(ProductResponse.convertToProductResponse(productService.getAll()),HttpStatus.OK);
         }
+
+    @GetMapping("/user")
+    public ResponseEntity<List<ProductResponse>> getAllProductsUser(@RequestHeader(value = "Authorization" ,required = true ) String bearerToken
+            ){
+        String username = jwtTokenProvider.getUsername(bearerToken.substring(7, bearerToken.length()));
         return new ResponseEntity<>(ProductResponse.convertToProductResponse(productService.getByUsername(username)),HttpStatus.OK);
 
+    }
+    @GetMapping("/interested")
+    public ResponseEntity<List<ProductResponse>> getAllInterestedProducts(
+            @RequestHeader(value = "Authorization" ,required = true ) String bearerToken){
+        String username = jwtTokenProvider.getUsername(bearerToken.substring(7, bearerToken.length()));
+        User user = userService.findUserByUsername(username);
+        return new ResponseEntity<>(ProductResponse.convertToProductResponse(productService.findAllInterestedByUser(user)),HttpStatus.OK);
     }
 
     @GetMapping("/search")

@@ -3,6 +3,7 @@ package com.airmart.api.services;
 import com.airmart.api.domains.Chat;
 import com.airmart.api.domains.User;
 import com.airmart.api.repos.ChatRepo;
+import com.airmart.api.repos.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -45,7 +47,21 @@ public class ChatService  {
         Pageable pageable = new PageRequest(page, size, new Sort(new Sort.Order(Sort.Direction.DESC, "postedDate")));
         return chatRepository.findAll(pageable);
     }
-//    public Chat findByUsers(List<User> users){
-//        return chatRepository.findByUsers(users);
-//    }
+
+    public List<Chat> findAllByUser(User user){
+        List<Chat> result = new ArrayList<>();
+        for (Chat chat:
+             chatRepository.findAll()) {
+            String[] users = chat.getMessage().split(",");
+            for (String u:
+                 users) {
+                if(user.getUsername().equals(u)){
+                    result.add(chat);
+                }
+            }
+
+        }
+        return result;
+    }
+
 }
